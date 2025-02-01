@@ -5,7 +5,7 @@ FROM tomcat:9-jdk17
 RUN rm -rf /usr/local/tomcat/webapps/*
 
 # Copy the WAR file from the Maven target directory into Tomcat's webapps
-COPY /home/ec2-user/jenkins/workspace/XYZ_JavaApp/target/XYZtechnologies-1.0.war /usr/local/tomcat/webapps/ROOT.war
+COPY target/XYZtechnologies-1.0.war /usr/local/tomcat/webapps/ROOT.war
 
 # Expose port 8080 for Tomcat
 EXPOSE 8080
