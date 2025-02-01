@@ -23,7 +23,7 @@ kind: Service
 metadata:
   name: xyz-javaapp-service
 spec:
-  type: LoadBalancer
+  type: NodePort
   selector:
     app: xyz-javaapp
   ports:
