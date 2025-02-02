@@ -1,0 +1,52 @@
+pipeline {
+    agent {label 'jenkis-worker'}
+
+    // Use the Maven installation configured in Jenkins Global Tool Configuration
+    tools {
+        maven 'Maven_3.8.4'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clone the repository and check out the 'main' branch
+                git branch: 'main', url: 'https://github.com/NorthernLights1/XYZ_JavaApp.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                // Compile and package the application, producing the WAR file
+                sh 'mvn clean package'
+            }
+        }
+        stage('Test') {
+            steps {
+                // Run the unit tests
+                sh 'mvn test'
+            }
+        }
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    // Build the Docker image using the Dockerfile in the repository root.
+                    // The image is tagged with the build ID for uniqueness.
+                    def image = docker.build("ghostatlas14/xyz_javaapp:${env.BUILD_ID}")
+                    
+                    // Optionally push the image to Docker Hub automatically.
+                    // Ensure you have the Docker Hub credentials configured in Jenkins (with ID 'dockerhub-credentials-id').
+                    docker.withRegistry('https://index.docker.io/v1/', 'dockerhub-credentials-id') {
+                        image.push("latest")
+                    }
+                }
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Build, tests, and Docker image build succeeded! The WAR has been containerized with Tomcat.'
+        }
+        failure {
+            echo 'There were errors in the pipeline.'
+        }
+    }
+}
